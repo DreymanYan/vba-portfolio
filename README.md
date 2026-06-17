@@ -5,7 +5,7 @@
 
 ## Список проектов:
 
-- [АРМ Управление субподрядом](./01_Subcontract_Managemebt/README.md)
+- [АРМ "Управление субподрядом"](./01_Subcontract_Managemebt/README.md)
 
 ## Контакты
 - GitHub: Dreyman (https://github.com/dreyman)
