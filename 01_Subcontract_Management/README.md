@@ -82,21 +82,21 @@
 <table>
   <tr>
     <td width="50%">
-      <img src="screenshots/01-main-UF.jpg" alt="Главное окно"/><br/>
+      <img src="screenshots/01-main-UF.JPG" alt="Главное окно"/><br/>
       <sub><b>Рис. 1.</b> Главное окно — единое рабочее место</sub>
     </td>
     <td width="50%">
-      <img src="screenshots/02-lot-card.jpg" alt="Карточка лота"/><br/>
+      <img src="screenshots/02-lot-card.JPG" alt="Карточка лота"/><br/>
       <sub><b>Рис. 2.</b> Карточка лота: расчёт LeadTime и индикация отклонений</sub>
     </td>
   </tr>
   <tr>
     <td width="50%">
-      <img src="screenshots/03-contract-card.jpg" alt="Карточка договора"/><br/>
+      <img src="screenshots/03-contract-card.JPG" alt="Карточка договора"/><br/>
       <sub><b>Рис. 3.</b> Карточка договора: выполнение, остатки, банковские гарантии</sub>
     </td>
     <td width="50%">
-      <img src="screenshots/04-excel-report.jpg" alt="Отчёт в Excel"/><br/>
+      <img src="screenshots/04-excel-report.JPG" alt="Отчёт в Excel"/><br/>
       <sub><b>Рис. 4.</b> Управленческая отчётность в Excel</sub>
     </td>
   </tr>
