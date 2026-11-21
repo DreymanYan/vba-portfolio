@@ -107,7 +107,7 @@
 <table>
   <tr>
     <td width="50%"><img src="diagrams/architecture.png"/><br/><sub><b>Рис. 5.</b> Архитектура системы</sub></td>
-    <td width="50%"><img src="diagrams/data_model.png"/><br/><sub><b>Рис. 6.</b> ER-модель данных</sub></td>
+    <td width="50%"><img src="diagrams/data_model_full.png"/><br/><sub><b>Рис. 6.</b> ER-диаграмма БД</sub></td>
   </tr>
   <tr>
     <td width="50%"><img src="diagrams/roadmap.png"/><br/><sub><b>Рис. 7.</b> Дорожная карта проекта</sub></td>
