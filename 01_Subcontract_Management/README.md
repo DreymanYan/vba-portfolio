@@ -107,7 +107,9 @@
 <table>
   <tr>
     <td width="100%"><img src="diagrams/architecture.png"/><br/><sub><b>Рис. 5.</b> Архитектура системы</sub></td>
-  </tr>
+  </tr
+</table>
+<table>
   <tr>
     <td width="50%"><img src="diagrams/data_model_full.png"/><br/><sub><b>Рис. 6.</b> ER-диаграмма БД</sub></td>
     <td width="50%"><img src="diagrams/lot_lifecycle.png"/><br/><sub><b>Рис. 7.</b> Жизненный цикл лота</sub></td>
