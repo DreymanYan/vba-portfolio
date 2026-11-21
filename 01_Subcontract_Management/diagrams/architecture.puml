@@ -1,0 +1,30 @@
+@startuml
+!theme plain
+title Архитектура АРМ «Управление субподрядом»
+
+package "Клиент (Excel VBA)" {
+  [UserForms\n(MainUF)]
+  [Модули VBA\n(aPublic, updtCmBx, updtSts)]
+  [ADODB]
+}
+
+package "Корпоративная КИС" {
+  database "SQL Server\n(учётная БД)" as SQL
+}
+
+package "Витрина данных" {
+  database "Access\n(BDData.accdb)\nдемо/офлайн" as ACC
+}
+
+package "Файловое хранилище" {
+  folder "00_Статус контрактации" as FS1
+  folder "01_Договоры" as FS2
+}
+
+[UserForms\n(MainUF)] --> [Модули VBA\n(aPublic, updtCmBx, updtSts)]
+[Модули VBA\n(aPublic, updtCmBx, updtSts)] --> [ADODB]
+[ADODB] --> SQL : SQL-запросы\n(учёт, аналитика)
+[ADODB] --> ACC : синхронизация\n(витрина)
+[Модули VBA\n(aPublic, updtCmBx, updtSts)] --> FS1
+[Модули VBA\n(aPublic, updtCmBx, updtSts)] --> FS2
+@enduml
