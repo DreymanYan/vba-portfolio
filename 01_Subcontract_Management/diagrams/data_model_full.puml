@@ -1,0 +1,496 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 9
+skinparam linetype ortho
+skinparam nodesep 18
+skinparam ranksep 28
+
+title ER-диаграмма БД АРМ «Управление субподрядом»\n(по фактической схеме Access)
+
+legend right
+  <<PK>> — первичный ключ (COUNTER)
+  <<FK>> — внешний ключ (DOUBLE)
+  <<UK>> — бизнес-ключ (шифр)
+  deleted : BOOL — «мягкое удаление»
+  business-таблицы: create_date/user + update_date/user
+  справочники dct_* и tbl_PlnCntr_BE: только update_date/user
+endlegend
+
+' =====================================================================
+' 1. СПРАВОЧНИКИ
+' =====================================================================
+package "1. Справочники (dct_*)" #F7F7F7 {
+
+  entity "dct_SP\nСтруктурные подразделения" as DCT_SP {
+    * id : COUNTER <<PK>>
+    --
+    spfullname : MEMO
+    spname : MEMO
+    spshort : MEMO
+    type : MEMO
+    deleted : BOOL
+    update_date : DATETIME
+    update_user : MEMO
+  }
+
+  entity "dct_UPDict\nУзловые проекты" as DCT_UP {
+    * id : COUNTER <<PK>>
+    --
+    sp_id : DOUBLE <<FK dct_SP>>
+    sp : MEMO
+    up_code : MEMO <<UK>>
+    up_name : MEMO
+    be_name : MEMO
+    type : MEMO
+    deleted : BOOL
+    update_date : DATETIME
+    update_user : MEMO
+    user_up_name : MEMO
+  }
+
+  entity "dct_TOTSDict\nТОТС" as DCT_TOTS {
+    * id : COUNTER <<PK>>
+    --
+    up_id : DOUBLE <<FK dct_UPDict>>
+    isr_lvl1_id : DOUBLE <<FK dct_ISR_lvl1>>
+    tots_code : MEMO <<UK>>
+    tots_name : MEMO
+    type : MEMO
+    deleted : BOOL
+    update_date : DATETIME
+    update_user : MEMO
+    user_tots_name : MEMO
+  }
+
+  entity "dct_ISR_lvl1\nИСР — уровень 1" as DCT_ISR1 {
+    * id : COUNTER <<PK>>
+    --
+    up_id : DOUBLE <<FK dct_UPDict>>
+    isr_code_lvl1 : MEMO <<UK>>
+    isr_name_lvl1 : MEMO
+    type : MEMO
+    deleted : BOOL
+    update_date : DATETIME
+    update_user : MEMO
+    user_isr_name_lvl1 : MEMO
+  }
+
+  entity "dct_ISR_lvl2\nИСР — уровень 2" as DCT_ISR2 {
+    * id : COUNTER <<PK>>
+    --
+    up_id : DOUBLE <<FK dct_UPDict>>
+    isr_lvl1_id : DOUBLE <<FK dct_ISR_lvl1>>
+    isr_code_lvl2 : MEMO <<UK>>
+    isr_name_lvl2 : MEMO
+    type : MEMO
+    deleted : BOOL
+    update_date : DATETIME
+    update_user : MEMO
+    user_isr_name_lvl2 : MEMO
+  }
+
+  entity "dct_ISR_lvl3\nИСР — уровень 3" as DCT_ISR3 {
+    * id : COUNTER <<PK>>
+    --
+    up_id : DOUBLE <<FK dct_UPDict>>
+    isr_lvl1_id : DOUBLE <<FK dct_ISR_lvl1>>
+    isr_lvl2_id : DOUBLE <<FK dct_ISR_lvl2>>
+    isr_code_lvl3 : DOUBLE <<UK>>
+    isr_name_lvl3 : MEMO
+    type : MEMO
+    deleted : BOOL
+    update_date : DATETIME
+    update_user : MEMO
+    user_isr_name_lvl3 : MEMO
+  }
+
+  entity "dct_ISRDict\nИСР — сводный (4–5 уровни)" as DCT_ISR {
+    * id : COUNTER <<PK>>
+    --
+    up_id : DOUBLE <<FK dct_UPDict>>
+    isr_lvl1_id : DOUBLE <<FK dct_ISR_lvl1>>
+    isr_lvl2_id : DOUBLE <<FK dct_ISR_lvl2>>
+    isr_lvl3_id : DOUBLE <<FK dct_ISR_lvl3>>
+    isr_code_lvl4 : DOUBLE
+    isr_code_lvl5 : DOUBLE
+    isr_fullcode : MEMO <<UK>>
+    isr_name : MEMO
+    po : MEMO
+    type : MEMO
+    deleted : BOOL
+    update_date : DATETIME
+    update_user : MEMO
+    user_isr_name : MEMO
+  }
+}
+
+' =====================================================================
+' 2. БИЗНЕС-СУЩНОСТИ
+' =====================================================================
+package "2. Бизнес-сущности" {
+
+  entity "tbl_PlnCntr_Isplnt\nИсполнитель" as ISP {
+    * id : COUNTER <<PK>>
+    --
+    Исполнитель : MEMO
+    PathName : MEMO
+    create_date : DATETIME
+    create_user : MEMO
+    deleted : BOOL
+    update_date : DATETIME
+    update_user : MEMO
+  }
+
+  entity "tbl_PlnCntr_BE\nБизнес-единица (справочник)" as BE {
+    * id : COUNTER <<PK>>
+    --
+    bename : MEMO <<UK>>
+    befullname : MEMO
+    beshort : MEMO
+    deleted : BOOL
+    update_date : DATETIME
+    update_user : MEMO
+  }
+
+  entity "tbl_PlnCntr_LOT\nЛот (9 этапов контрактации)" as LOT {
+    * id : COUNTER <<PK>>
+    --
+    ' Идентификация
+    Заказчик : MEMO
+    Лот номер : MEMO
+    Лот дата : DATETIME
+    Лот наименование : MEMO
+    Лот описание : MEMO
+    id Договор : DOUBLE <<FK tbl_PlnCntr_Dgvr>>
+    subfolder : MEMO
+    Завершен : BOOL
+    Срочность : DOUBLE
+    ' Этап 1 — ТЗ
+    ТехЗадание номер : MEMO
+    ТехЗадание дата : DATETIME
+    ТехЗадание комментарий : MEMO
+    ' Этап 2 — БО
+    Бюджетная оценка : DOUBLE
+    БО дата : DATETIME
+    БО комментарий : MEMO
+    ' Этап 3 — СЭД
+    СЭД номер : MEMO
+    СЭД дата : DATETIME
+    СЭД дата распр : DATETIME
+    СЭД распределение : MEMO
+    СЭД отвественный : MEMO
+    СЭД ссылка : MEMO
+    СЭД комментарий : MEMO
+    ' Этап 4 — ТКП
+    ТКП номер : MEMO
+    ТКП дата : DATETIME
+    ТКП дата конверта : DATETIME
+    ТКП наименование : MEMO
+    ТКП ссылка : MEMO
+    ТКП комментарий : MEMO
+    ' Этап 5 — ТО
+    ТехОценка : BOOL
+    ТО дата : DATETIME
+    ТО комментарий : MEMO
+    ' Этап 6 — МО
+    Матрица оценки : BOOL
+    МО дата : DATETIME
+    МО комментарий : MEMO
+    ' Этап 7 — Протокол
+    Протокол номер : MEMO
+    Протокол дата : DATETIME
+    Протокол дата начала : DATETIME
+    Протокол дата окончания : DATETIME
+    Протокол сумма : DOUBLE
+    Протокол комментарий : MEMO
+    ' Этап 8 — ГП
+    ГП номер : MEMO
+    ГП дата : DATETIME
+    ГП исполнитель : DOUBLE <<FK tbl_PlnCntr_Isplnt>>
+    ГП начало СМР : DATETIME
+    ГП комментарий : MEMO
+    ' Этап 9 — Договор
+    Договор комментарий : MEMO
+    Договор ЦДР : DATETIME
+    ' Даты СМР
+    Дата СД : DATETIME
+    Дата РД : DATETIME
+    Дата начала СМР : DATETIME
+    Дата окончания СМР : DATETIME
+    --
+    create_date, create_user,
+    deleted, update_date, update_user
+  }
+
+  entity "tbl_PlnCntr_Dgvr\nДоговор / ДС" as DOG {
+    * id : COUNTER <<PK>>
+    --
+    ' Иерархия договоров
+    id Договор : DOUBLE <<FK self>>  ' 0 = основной
+    id Лот : DOUBLE <<FK tbl_PlnCntr_LOT>>
+    id Исполнитель : DOUBLE <<FK tbl_PlnCntr_Isplnt>>
+    Заказчик : MEMO
+    Номер : MEMO
+    Дата : DATETIME
+    ДС : MEMO
+    Сумма по договору : DOUBLE
+    Удорожание : BOOL
+    ' СМР
+    Дата начала СМР : DATETIME
+    Дата окончания СМР : DATETIME
+    Итоговый Акт : DATETIME
+    Accepted : BOOL
+    ' Банковские гарантии (аванс)
+    БанкГарантия_Аванс : BOOL
+    БанкГарантия_Дата : DATETIME
+    БанкГарантия_extend : DATETIME
+    БГаванс : DOUBLE
+    БГаванс_data : DATETIME
+    БГаванс_extend : DATETIME
+    ' Банковские гарантии (ГУ)
+    БГгарант : DOUBLE
+    БГгарант_data : DATETIME
+    БГгарант_extend : DATETIME
+    ' Удержания
+    ГарантУдержание : BOOL
+    ГарУдержание1 : BOOL
+    ГарУдержание2 : BOOL
+    ' Прочее
+    Закрыто в КС-3 : DOUBLE
+    СЭД ссылка : MEMO
+    Path : MEMO
+    --
+    create_date, create_user,
+    deleted, update_date, update_user
+  }
+
+  entity "tbl_PlnCntr_KC\nКС-6а (регистр выполнения)" as KC {
+    * id : COUNTER <<PK>>
+    --
+    id Договор : DOUBLE <<FK tbl_PlnCntr_Dgvr>>
+    Значение : DOUBLE
+    Период : DATETIME
+    Тип : DOUBLE  ' 1=факт, 2=ожидаемое
+    --
+    create_date, create_user,
+    deleted, update_date, update_user
+  }
+
+  entity "tbl_PlnCntr_Notes\nХронология по лоту" as NOTES {
+    * id : COUNTER <<PK>>
+    --
+    id_pos : DOUBLE <<FK tbl_PlnCntr_LOT>>
+    header : MEMO
+    descrptn : MEMO
+    type : MEMO       ' веха/проблема/задача
+    stage : MEMO      ' этап
+    list : MEMO
+    result : MEMO
+    status : BOOL
+    taskOwner : MEMO
+    dateSt : DATETIME
+    dateFin : DATETIME
+    --
+    create_date, create_user,
+    deleted, update_date, update_user
+  }
+
+  entity "tbl_PlnCntr_Dgvr_NoteTopics\nТемы переписки" as TOPICS {
+    * id : COUNTER <<PK>>
+    --
+    dgvr_id : DOUBLE <<FK tbl_PlnCntr_Dgvr>>
+    parent_dgvr_id : DOUBLE <<FK tbl_PlnCntr_Dgvr>>
+    base_note_id : DOUBLE <<FK tbl_PlnCntr_Dgvr_Notes>>
+    title : MEMO
+    --
+    create_date, create_user,
+    deleted, update_date, update_user
+  }
+
+  entity "tbl_PlnCntr_Dgvr_Notes\nПисьма" as MAIL {
+    * id : COUNTER <<PK>>
+    --
+    topic_id : DOUBLE <<FK tbl_PlnCntr_Dgvr_NoteTopics>>
+    parent_note_id : DOUBLE <<FK self>>  ' ответы
+    number : MEMO
+    date : DATETIME
+    subject : MEMO
+    note_content : MEMO
+    note_status : MEMO
+    type : MEMO       ' вх/исх/внутр
+    link : MEMO
+    --
+    create_date, create_user,
+    deleted, update_date, update_user
+  }
+}
+
+' =====================================================================
+' 3. ПРОИЗВОДСТВЕННАЯ ПРОГРАММА
+' =====================================================================
+package "3. Производственная программа" {
+
+  entity "tbl_PlnCntr_PP\nПозиция ПП" as PP {
+    * id : COUNTER <<PK>>
+    --
+    ' Иерархия
+    up_id : DOUBLE <<FK dct_UPDict>>
+    up_code : MEMO
+    tots_id : DOUBLE <<FK dct_TOTSDict>>
+    isr_id : DOUBLE <<FK dct_ISRDict>>
+    isr_code : MEMO
+    isr_lvl1_id : DOUBLE <<FK dct_ISR_lvl1>>
+    isr_lvl2_id : DOUBLE <<FK dct_ISR_lvl2>>
+    isr_lvl3_id : DOUBLE <<FK dct_ISR_lvl3>>
+    ' Шифры
+    dmark : MEMO          ' марка чертежа
+    estimatecode : MEMO   ' ЛСР шифр
+    ' Привязка к лоту
+    lot_id : DOUBLE <<FK tbl_PlnCntr_LOT>>
+    ' Экономика и атрибуты
+    costpp : DOUBLE
+    budget : BOOL
+    datepp : DATETIME
+    year : DOUBLE
+    priority : MEMO
+    sub_type : MEMO       ' СС/СУБ
+    typepp : MEMO
+    note : MEMO
+    ' Пользовательские значения
+    user_up_code : MEMO
+    user_isr_code : MEMO
+    user_dmark : MEMO
+    user_estimatecode : MEMO
+    --
+    create_date, create_user,
+    deleted, update_date, update_user
+  }
+
+  entity "tbl_PlnCntr_PPAccess\nПП — права доступа" as PPA {
+    * id : COUNTER <<PK>>
+    --
+    ' Копия структуры tbl_PlnCntr_PP
+    up_id : DOUBLE
+    up_code : MEMO
+    tots_id : DOUBLE
+    isr_id : DOUBLE
+    isr_code : MEMO
+    isr_lvl1_id : DOUBLE
+    isr_lvl2_id : DOUBLE
+    isr_lvl3_id : DOUBLE
+    dmark : MEMO
+    estimatecode : MEMO
+    lot_id : DOUBLE
+    costpp : DOUBLE
+    budget : BOOL
+    datepp : DATETIME
+    year : DOUBLE
+    priority : MEMO
+    sub_type : MEMO
+    typepp : MEMO
+    note : MEMO
+    user_* : MEMO
+    --
+    create_date, create_user,
+    deleted, update_date, update_user
+  }
+
+  entity "tbl_Data_PlnCntrct\nДенормализованный срез ПП" as DATA {
+    * id : COUNTER <<PK>>
+    --
+    ' Текстовые копии иерархии (для UI)
+    Площадка : MEMO
+    УПШифр : MEMO
+    УПОписание : MEMO
+    ТОТСОписание : MEMO
+    ИСРШифр : MEMO
+    ИСРОписание : MEMO
+    Марка чертежа : MEMO
+    ЛСРШифр : MEMO
+    ' Атрибуты
+    Заказчик : MEMO
+    Дисциплина : MEMO
+    Год : DOUBLE
+    Бюджет : DOUBLE
+    ДоляСуб : DOUBLE
+    БЕ : MEMO
+    Версия : MEMO
+    Приоритет : DOUBLE
+    Субподряд : BOOL
+    Номер Лота : MEMO
+    ' Помесячные объёмы
+    Значение_01 : DOUBLE
+    Значение_02 : DOUBLE
+    Значение_03 : DOUBLE
+    Значение_04 : DOUBLE
+    Значение_05 : DOUBLE
+    Значение_06 : DOUBLE
+    Значение_07 : DOUBLE
+    Значение_08 : DOUBLE
+    Значение_09 : DOUBLE
+    Значение_10 : DOUBLE
+    Значение_11 : DOUBLE
+    Значение_12 : DOUBLE
+    --
+    create_date, create_user,
+    deleted, update_date, update_user
+  }
+}
+
+' =====================================================================
+' СВЯЗИ
+' =====================================================================
+
+' --- Иерархия справочников ---
+DCT_SP   ||--o{ DCT_UP   : sp_id
+DCT_UP   ||--o{ DCT_ISR1 : up_id
+DCT_UP   ||--o{ DCT_ISR2 : up_id
+DCT_UP   ||--o{ DCT_ISR3 : up_id
+DCT_UP   ||--o{ DCT_ISR  : up_id
+DCT_UP   ||--o{ DCT_TOTS : up_id
+DCT_ISR1 ||--o{ DCT_ISR2 : isr_lvl1_id
+DCT_ISR1 ||--o{ DCT_ISR3 : isr_lvl1_id
+DCT_ISR1 ||--o{ DCT_ISR  : isr_lvl1_id
+DCT_ISR1 ||--o{ DCT_TOTS : isr_lvl1_id
+DCT_ISR2 ||--o{ DCT_ISR3 : isr_lvl2_id
+DCT_ISR2 ||--o{ DCT_ISR  : isr_lvl2_id
+DCT_ISR3 ||--o{ DCT_ISR  : isr_lvl3_id
+
+' --- ПП → справочники ---
+DCT_UP   ||--o{ PP : up_id
+DCT_TOTS ||--o{ PP : tots_id
+DCT_ISR  ||--o{ PP : isr_id
+DCT_ISR1 ||--o{ PP : isr_lvl1_id
+DCT_ISR2 ||--o{ PP : isr_lvl2_id
+DCT_ISR3 ||--o{ PP : isr_lvl3_id
+
+' --- Лоты ↔ ПП ---
+LOT ||--o{ PP  : lot_id
+LOT ||--o{ PPA : lot_id
+
+' --- Лоты ↔ договоры ---
+LOT ||--o{ DOG : "id Лот"
+LOT }o--|| DOG : "id Договор"
+ISP ||--o{ DOG : "id Исполнитель"
+ISP ||--o{ LOT : "ГП исполнитель"
+
+' --- Договоры: основной → ДС ---
+DOG ||--o{ DOG : "id Договор"
+
+' --- Договоры → КС-6а ---
+DOG ||--o{ KC : "id Договор"
+
+' --- Хронология ---
+LOT ||--o{ NOTES : id_pos
+
+' --- Переписка ---
+DOG    ||--o{ TOPICS : dgvr_id
+DOG    ||--o{ TOPICS : parent_dgvr_id
+MAIL   ||--o{ TOPICS : base_note_id
+TOPICS ||--o{ MAIL   : topic_id
+MAIL   ||--o{ MAIL   : parent_note_id
+
+@enduml
