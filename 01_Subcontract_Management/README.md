@@ -106,8 +106,11 @@
 *(см. папку `diagrams/`)*
 <table>
   <tr>
-    <td width="100%"><img src="diagrams/architecture.png"/><br/><sub><b>Рис. 5.</b> Архитектура системы</sub></td>
-  </tr
+    <td width="100%"><img src="diagrams/architecture.png"/></td>
+  </tr>
+  <tr>
+    <td width="100%" align="center"><sub><b>Рис. 5.</b> Архитектура системы</sub></td>
+  </tr>
 </table>
 <table>
   <tr>
