@@ -102,6 +102,19 @@
   </tr>
 </table>
 
+## Диаграммы
+*(см. папку `diagrams/`)*
+<table>
+  <tr>
+    <td width="50%"><img src="diagrams/architecture.png"/><br/><sub><b>Рис. 5.</b> Архитектура системы</sub></td>
+    <td width="50%"><img src="diagrams/data_model.png"/><br/><sub><b>Рис. 6.</b> ER-модель данных</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="diagrams/roadmap.png"/><br/><sub><b>Рис. 7.</b> Дорожная карта проекта</sub></td>
+    <td width="50%"><img src="diagrams/lot_lifecycle.png"/><br/><sub><b>Рис. 8.</b> Жизненный цикл лота</sub></td>
+  </tr>
+</table>
+
 ## Компетенции подтвержденные проектом
 - Полный цикл разработки ПО: от сбора требований до внедрения.
 - Проектирование реляционных БД (10+ таблиц, нормализация, сложные SQL-запросы).
